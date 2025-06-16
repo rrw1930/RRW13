@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>牛顿运动定律互动演示</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+            z-index: -1;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .laws-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .law-card {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 15px;
+            padding: 25px;
+            width: 350px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .law-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .law-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+            z-index: -1;
+        }
+        
+        .law-number {
+            font-size: 5rem;
+            font-weight: bold;
+            opacity: 0.2;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            line-height: 1;
+        }
+        
+        .law-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #ffd166;
+            border-bottom: 2px solid rgba(255, 209, 102, 0.5);
+            padding-bottom: 10px;
+        }
+        
+        .law-statement {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            min-height: 100px;
+        }
+        
+        .law-formula {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Cambria Math', serif;
+            font-size: 1.4rem;
+            text-align: center;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .demo-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .demo-title {
+            font-size: 2.2rem;
+            color: #6ab04c;
+            margin-bottom: 10px;
+        }
+        
+        .demo-description {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .animation-area {
+            height: 400px;
+            background: rgba(0, 20, 40, 0.7);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+        }
+        
+        .object {
+            position: absolute;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .force-arrow {
+            position: absolute;
+            height: 4px;
+            background: #ff6b6b;
+            transform-origin: left center;
+            box-shadow: 0 0 10px #ff6b6b;
+        }
+        
+        .arrow-head {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 15px solid #ff6b6b;
+            right: -15px;
+            top: -6px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #3ca0db, #2c89c9);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn.reset {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+        
+        .btn.demo {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+        }
+        
+        .slider-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            width: 100%;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            outline: none;
+        }
+        
+        .explanation {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .explanation h3 {
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+        
+        .explanation p {
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+        
+        .real-life {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .real-life h4 {
+            color: #f1c40f;
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .laws-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .law-card {
+                width: 100%;
+                max-width: 500px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-atom"></i> 牛顿运动定律互动演示</h1>
+            <p class="subtitle">通过交互式动画理解牛顿三大运动定律的基本原理。调整参数、观察运动变化，并探索这些定律在现实生活中的应用。</p>
+        </header>
+        
+        <div class="laws-container">
+            <div class="law-card">
+                <div class="law-number">1</div>
+                <h2 class="law-title">牛顿第一定律</h2>
+                <p class="law-statement">一个物体如果没有受到外力的作用，将保持静止状态或匀速直线运动状态。</p>
+                <div class="law-formula">∑F = 0 ⇒ a = 0</div>
+                <p>也称为惯性定律，描述了物体在不受外力时的运动状态。</p>
+            </div>
+            
+            <div class="law-card">
+                <div class="law-number">2</div>
+                <h2 class="law-title">牛顿第二定律</h2>
+                <p class="law-statement">物体的加速度与作用力成正比，与物体的质量成反比，加速度的方向与作用力的方向相同。</p>
+                <div class="law-formula">F = m · a</div>
+                <p>这是经典力学的核心公式，定量描述了力与运动的关系。</p>
+            </div>
+            
+            <div class="law-card">
+                <div class="law-number">3</div>
+                <h2 class="law-title">牛顿第三定律</h2>
+                <p class="law-statement">当两个物体相互作用时，彼此施加于对方的力大小相等、方向相反。</p>
+                <div class="law-formula">F<sub>AB</sub> = -F<sub>BA</sub></div>
+                <p>作用力与反作用力总是成对出现，且性质相同。</p>
+            </div>
+        </div>
+        
+        <div class="demo-container">
+            <div class="demo-header">
+                <h2 class="demo-title">牛顿第二定律互动演示</h2>
+                <p class="demo-description">调整作用力大小和物体质量，观察加速度的变化。验证公式 F = m·a 在实际运动中的体现。</p>
+            </div>
+            
+            <div class="animation-area" id="animationArea">
+                <!-- 动画元素由JavaScript生成 -->
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>作用力 (F): <span id="forceValue">50 N</span></span>
+                </div>
+                <input type="range" min="10" max="100" value="50" class="slider" id="forceSlider">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>物体质量 (m): <span id="massValue">10 kg</span></span>
+                </div>
+                <input type="range" min="5" max="30" value="10" class="slider" id="massSlider">
+            </div>
+            
+            <div class="controls">
+                <button class="btn" id="startBtn"><i class="fas fa-play"></i> 开始运动</button>
+                <button class="btn reset" id="resetBtn"><i class="fas fa-redo"></i> 重置实验</button>
+                <button class="btn demo" id="demoBtn"><i class="fas fa-vial"></i> 自动演示</button>
+            </div>
+            
+            <div class="explanation">
+                <h3><i class="fas fa-lightbulb"></i> 原理说明</h3>
+                <p>牛顿第二定律公式：F = m·a，其中：</p>
+                <p>• F 是作用在物体上的合力（单位：牛顿 N）</p>
+                <p>• m 是物体的质量（单位：千克 kg）</p>
+                <p>• a 是物体的加速度（单位：米/秒² m/s²）</p>
+                <p>从公式可以看出：</p>
+                <p>1. 当质量一定时，作用力越大，加速度越大</p>
+                <p>2. 当作用力一定时，质量越大，加速度越小</p>
+                
+                <div class="real-life">
+                    <h4><i class="fas fa-globe-americas"></i> 实际应用</h4>
+                    <p>• 汽车引擎需要产生更大的力来加速更重的车辆</p>
+                    <p>• 火箭推进器需要巨大的推力来克服火箭的巨大质量</p>
+                    <p>• 相同推力下，小质量物体比大质量物体更容易加速</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-container">
+            <div class="demo-header">
+                <h2 class="demo-title">牛顿第三定律互动演示</h2>
+                <p class="demo-description">观察两个相互作用的物体。当物体A对物体B施加作用力时，物体会对物体A施加一个大小相等、方向相反的反作用力。</p>
+            </div>
+            
+            <div class="animation-area" id="thirdLawAnimation">
+                <!-- 牛顿第三定律动画区域 -->
+            </div>
+            
+            <div class="controls">
+                <button class="btn" id="interactBtn"><i class="fas fa-handshake"></i> 相互作用</button>
+            </div>
+            
+            <div class="explanation">
+                <h3><i class="fas fa-lightbulb"></i> 原理说明</h3>
+                <p>牛顿第三定律指出：相互作用的两个物体之间的作用力和反作用力总是大小相等，方向相反，作用在同一条直线上。</p>
+                <p>数学表达式：F<sub>AB</sub> = -F<sub>BA</sub></p>
+                
+                <div class="real-life">
+                    <h4><i class="fas fa-globe-americas"></i> 实际应用</h4>
+                    <p>• 火箭推进：火箭向下喷出气体，气体对火箭产生向上的推力</p>
+                    <p>• 走路：脚向后推地面，地面对脚产生向前的推力</p>
+                    <p>• 游泳：手臂向后推水，水对手臂产生向前的推力</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>牛顿运动定律互动演示 | 为中学物理教学而设计 | 使用HTML5 Canvas和JavaScript实现</p>
+            <p>© 2023 物理教学资源 | 牛顿运动定律</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const animationArea = document.getElementById('animationArea');
+            const forceSlider = document.getElementById('forceSlider');
+            const massSlider = document.getElementById('massSlider');
+            const forceValue = document.getElementById('forceValue');
+            const massValue = document.getElementById('massValue');
+            const startBtn = document.getElementById('startBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const demoBtn = document.getElementById('demoBtn');
+            const interactBtn = document.getElementById('interactBtn');
+            const thirdLawAnimation = document.getElementById('thirdLawAnimation');
+            
+            // 创建Canvas元素
+            const canvas = document.createElement('canvas');
+            canvas.width = animationArea.clientWidth;
+            canvas.height = animationArea.clientHeight;
+            canvas.style.borderRadius = '8px';
+            animationArea.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+            
+            // 创建第三定律Canvas
+            const thirdCanvas = document.createElement('canvas');
+            thirdCanvas.width = thirdLawAnimation.clientWidth;
+            thirdCanvas.height = thirdLawAnimation.clientHeight;
+            thirdCanvas.style.borderRadius = '8px';
+            thirdLawAnimation.appendChild(thirdCanvas);
+            const thirdCtx = thirdCanvas.getContext('2d');
+            
+            // 物理参数
+            let force = 50; // 牛顿
+            let mass = 10;  // 千克
+            let acceleration = 0;
+            let velocity = 0;
+            let position = 50;
+            let isMoving = false;
+            let animationId = null;
+            let demoMode = false;
+            
+            // 第三定律变量
+            let object1Pos = 150;
+            let object2Pos = 450;
+            let object1Vel = 0;
+            let object2Vel = 0;
+            let interactionActive = false;
+            
+            // 更新显示的值
+            function updateValues() {
+                forceValue.textContent = force + " N";
+                massValue.textContent = mass + " kg";
+                acceleration = force / mass;
+            }
+            
+            // 绘制场景
+            function drawScene() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制地面
+                ctx.fillStyle = '#2c3e50';
+                ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+                
+                // 绘制网格线表示地面
+                ctx.strokeStyle = '#34495e';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < canvas.width; i += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, canvas.height - 40);
+                    ctx.lineTo(i, canvas.height);
+                    ctx.stroke();
+                }
+                
+                // 绘制物体
+                ctx.fillStyle = '#3498db';
+                ctx.fillRect(position, canvas.height - 140, 80, 80);
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText(mass + ' kg', position + 15, canvas.height - 90);
+                
+                // 绘制力箭头
+                if (isMoving || demoMode) {
+                    ctx.strokeStyle = '#e74c3c';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(position + 80, canvas.height - 100);
+                    ctx.lineTo(position + 180, canvas.height - 100);
+                    ctx.stroke();
+                    
+                    // 绘制箭头头部
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.beginPath();
+                    ctx.moveTo(position + 180, canvas.height - 100);
+                    ctx.lineTo(position + 165, canvas.height - 95);
+                    ctx.lineTo(position + 165, canvas.height - 105);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // 标注力大小
+                    ctx.fillStyle = '#ecf0f1';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillText(force + ' N', position + 110, canvas.height - 110);
+                }
+                
+                // 显示加速度值
+                ctx.fillStyle = '#2ecc71';
+                ctx.font = 'bold 18px Arial';
+                ctx.fillText('加速度: ' + acceleration.toFixed(2) + ' m/s²', 20, 30);
+                ctx.fillText('速度: ' + velocity.toFixed(2) + ' m/s', 20, 60);
+            }
+            
+            // 绘制第三定律场景
+            function drawThirdLawScene() {
+                thirdCtx.clearRect(0, 0, thirdCanvas.width, thirdCanvas.height);
+                
+                // 绘制地面
+                thirdCtx.fillStyle = '#2c3e50';
+                thirdCtx.fillRect(0, thirdCanvas.height - 40, thirdCanvas.width, 40);
+                
+                // 绘制网格线
+                thirdCtx.strokeStyle = '#34495e';
+                thirdCtx.lineWidth = 2;
+                for (let i = 0; i < thirdCanvas.width; i += 20) {
+                    thirdCtx.beginPath();
+                    thirdCtx.moveTo(i, thirdCanvas.height - 40);
+                    thirdCtx.lineTo(i, thirdCanvas.height);
+                    thirdCtx.stroke();
+                }
+                
+                // 绘制物体1
+                thirdCtx.fillStyle = '#3498db';
+                thirdCtx.fillRect(object1Pos, thirdCanvas.height - 140, 80, 80);
+                thirdCtx.fillStyle = 'white';
+                thirdCtx.font = 'bold 16px Arial';
+                thirdCtx.fillText('5 kg', object1Pos + 20, thirdCanvas.height - 90);
+                
+                // 绘制物体2
+                thirdCtx.fillStyle = '#9b59b6';
+                thirdCtx.fillRect(object2Pos, thirdCanvas.height - 140, 80, 80);
+                thirdCtx.fillStyle = 'white';
+                thirdCtx.font = 'bold 16px Arial';
+                thirdCtx.fillText('10 kg', object2Pos + 20, thirdCanvas.height - 90);
+                
+                // 绘制作用力箭头
+                if (interactionActive) {
+                    // 物体1对物体2的力
+                    thirdCtx.strokeStyle = '#e74c3c';
+                    thirdCtx.lineWidth = 4;
+                    thirdCtx.beginPath();
+                    thirdCtx.moveTo(object1Pos + 80, thirdCanvas.height - 100);
+                    thirdCtx.lineTo(object2Pos, thirdCanvas.height - 100);
+                    thirdCtx.stroke();
+                    
+                    // 箭头头部
+                    thirdCtx.fillStyle = '#e74c3c';
+                    thirdCtx.beginPath();
+                    thirdCtx.moveTo(object2Pos, thirdCanvas.height - 100);
+                    thirdCtx.lineTo(object2Pos - 10, thirdCanvas.height - 95);
+                    thirdCtx.lineTo(object2Pos - 10, thirdCanvas.height - 105);
+                    thirdCtx.closePath();
+                    thirdCtx.fill();
+                    
+                    // 标注力大小
+                    thirdCtx.fillStyle = '#ecf0f1';
+                    thirdCtx.font = 'bold 16px Arial';
+                    thirdCtx.fillText('F = 100 N', (object1Pos + object2Pos) / 2 - 30, thirdCanvas.height - 120);
+                    
+                    // 物体2对物体1的力
+                    thirdCtx.strokeStyle = '#2ecc71';
+                    thirdCtx.lineWidth = 4;
+                    thirdCtx.beginPath();
+                    thirdCtx.moveTo(object2Pos, thirdCanvas.height - 100);
+                    thirdCtx.lineTo(object1Pos + 80, thirdCanvas.height - 100);
+                    thirdCtx.stroke();
+                    
+                    // 箭头头部
+                    thirdCtx.fillStyle = '#2ecc71';
+                    thirdCtx.beginPath();
+                    thirdCtx.moveTo(object1Pos + 80, thirdCanvas.height - 100);
+                    thirdCtx.lineTo(object1Pos + 90, thirdCanvas.height - 95);
+                    thirdCtx.lineTo(object1Pos + 90, thirdCanvas.height - 105);
+                    thirdCtx.closePath();
+                    thirdCtx.fill();
+                    
+                    // 标注力大小
+                    thirdCtx.fillStyle = '#ecf0f1';
+                    thirdCtx.font = 'bold 16px Arial';
+                    thirdCtx.fillText('F = 100 N', (object1Pos + object2Pos) / 2 - 30, thirdCanvas.height - 150);
+                    
+                    // 显示说明
+                    thirdCtx.fillStyle = '#f1c40f';
+                    thirdCtx.font = 'bold 18px Arial';
+                    thirdCtx.fillText('作用力与反作用力大小相等、方向相反', thirdCanvas.width/2 - 200, 40);
+                }
+            }
+            
+            // 动画循环
+            function animate() {
+                if (position > canvas.width - 80) {
+                    // 物体到达边缘，重置
+                    resetAnimation();
+                } else {
+                    // 更新位置
+                    velocity += acceleration * 0.1;
+                    position += velocity * 0.1;
+                    
+                    // 绘制场景
+                    drawScene();
+                    
+                    // 继续动画
+                    animationId = requestAnimationFrame(animate);
+                }
+            }
+            
+            // 第三定律动画
+            function animateThirdLaw() {
+                if (interactionActive) {
+                    // 计算加速度（F = m*a => a = F/m）
+                    const forceMagnitude = 100;
+                    const acc1 = forceMagnitude / 5;  // 物体1质量5kg
+                    const acc2 = -forceMagnitude / 10; // 物体2质量10kg
+                    
+                    // 更新速度
+                    object1Vel += acc1 * 0.05;
+                    object2Vel += acc2 * 0.05;
+                    
+                    // 更新位置
+                    object1Pos += object1Vel;
+                    object2Pos += object2Vel;
+                    
+                    // 检查碰撞
+                    if (object1Pos + 80 > object2Pos) {
+                        object1Pos = object2Pos - 80;
+                        interactionActive = false;
+                    }
+                    
+                    // 绘制场景
+                    drawThirdLawScene();
+                    
+                    // 继续动画
+                    requestAnimationFrame(animateThirdLaw);
+                }
+            }
+            
+            // 重置动画
+            function resetAnimation() {
+                isMoving = false;
+                velocity = 0;
+                position = 50;
+                drawScene();
+                
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+            }
+            
+            // 重置第三定律动画
+            function resetThirdLawAnimation() {
+                object1Pos = 150;
+                object2Pos = 450;
+                object1Vel = 0;
+                object2Vel = 0;
+                interactionActive = false;
+                drawThirdLawScene();
+            }
+            
+            // 初始化
+            updateValues();
+            drawScene();
+            drawThirdLawScene();
+            
+            // 事件监听器
+            forceSlider.addEventListener('input', function() {
+                force = parseInt(this.value);
+                updateValues();
+                if (isMoving) {
+                    resetAnimation();
+                }
+            });
+            
+            massSlider.addEventListener('input', function() {
+                mass = parseInt(this.value);
+                updateValues();
+                if (isMoving) {
+                    resetAnimation();
+                }
+            });
+            
+            startBtn.addEventListener('click', function() {
+                if (!isMoving) {
+                    isMoving = true;
+                    animate();
+                }
+            });
+            
+            resetBtn.addEventListener('click', function() {
+                resetAnimation();
+            });
+            
+            demoBtn.addEventListener('click', function() {
+                resetAnimation();
+                demoMode = true;
+                
+                // 演示序列
+                function runDemoSequence(step) {
+                    if (step > 3) {
+                        demoMode = false;
+                        resetAnimation();
+                        return;
+                    }
+                    
+                    resetAnimation();
+                    
+                    setTimeout(() => {
+                        switch(step) {
+                            case 1:
+                                force = 30;
+                                mass = 10;
+                                break;
+                            case 2:
+                                force = 70;
+                                mass = 10;
+                                break;
+                            case 3:
+                                force = 50;
+                                mass = 20;
+                                break;
+                        }
+                        
+                        forceSlider.value = force;
+                        massSlider.value = mass;
+                        updateValues();
+                        
+                        isMoving = true;
+                        animate();
+                        
+                        setTimeout(() => {
+                            runDemoSequence(step + 1);
+                        }, 3000);
+                    }, 1000);
+                }
+                
+                runDemoSequence(1);
+            });
+            
+            interactBtn.addEventListener('click', function() {
+                resetThirdLawAnimation();
+                interactionActive = true;
+                animateThirdLaw();
+            });
+            
+            // 响应窗口大小变化
+            window.addEventListener('resize', function() {
+                canvas.width = animationArea.clientWidth;
+                canvas.height = animationArea.clientHeight;
+                thirdCanvas.width = thirdLawAnimation.clientWidth;
+                thirdCanvas.height = thirdLawAnimation.clientHeight;
+                drawScene();
+                drawThirdLawScene();
+            });
+        });
+    </script>
+</body>
+</html>
